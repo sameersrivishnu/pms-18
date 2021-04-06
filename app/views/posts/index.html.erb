@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+  <% if current_user.superadmin_role?%>
+    <h1>Welcome Admin!</h1>
+  <% end %>
+
+<%= link_to 'New Post', new_post_path ,class:"btn btn-success",style:'color:white'%>
+<br>
+
+    <% @posts.each do |post| %>
+    <br>
+    <div class="border border-light rounded">
+      <% if (current_user.id == post.user_id) || (post.shared_users.where(:user_id => current_user.id).present? ) %>  
+         <br>
+        <h2><%= post.title %></h2>by<h6><%= post.user.email%></h6>
+        <p><%= post.body %></p>
+        <div><%= link_to 'Edit', edit_post_path(post),class:"btn btn-primary btn-sm float-right",style:'color:white' %>
+          <% if (post.user_id == current_user.id) %>
+            <%= link_to 'Delete', post, method: :delete, data: { confirm: 'Are you sure?' },class:"btn btn-danger btn-sm float-right",style:'color:white' %>
+          <%end%>
+        </div>  
+      <% end%>
+    </div>    
+    <% end %>
+
+

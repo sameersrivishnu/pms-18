@@ -1,0 +1,47 @@
+<div class="col-md-3">
+<%= form_with(model: post) do |form| %>
+  <% if post.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(post.errors.count, "error") %> prohibited this post from being saved:</h2>
+
+      <ul>
+        <% post.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title,class:"form-control" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :body %>
+    <%= form.text_area :body,class:"form-control"  %>
+  </div>
+
+  <% if (@post.user_id == nil) %>
+    <div class="field">
+      <%= form.label :share_with %>
+      <%= form.collection_select :share, User.where.not(id: current_user.id), :id, :email, {}, :multiple => 'true',class:"form-select form-select-lg mb-3"%>
+  <%end%>
+  <% if (@post.user_id == current_user.id)%>
+      <%= form.label :share_with %>
+      <% @post.shared_users.each do |su| %>
+      <table>
+         <tr><td> <%= su.user.email%></td>
+          <td><%= link_to 'Delete', shared_user_delete_path(su.id), method: :delete,class:"btn btn-danger btn-sm float-right",style:'color:white' %> </td>
+        </tr>
+      </table>  
+      <% end%>
+      <% remaining_users = User.where.not(id: current_user.id).where.not(id:@post.shared_users.pluck(:user_id))%>
+      <%= form.collection_select :share, remaining_users, :id, :email, {}, :multiple => 'true',class:"form-select form-select-lg mb-3"%>
+    </div>
+  <%end%>
+  <div class="actions">
+    <%= form.submit "Submit",class:"btn btn-success" ,onClick:"window.location.reload()"%>
+  </div>
+<% end %>
+</div>
